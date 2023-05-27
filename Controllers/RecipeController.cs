@@ -61,11 +61,14 @@ public class RecipeController : ControllerBase
     // PUT: api/Recipe/5
     [Authorize]     // Protected method
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateRecipe(int id, Recipe recipe)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateRecipe(int id, RecipeUpdateDto recipeUpdateDto)
     {
-        if (id != recipe.Id)
+        var recipe = await _context.Recipes.FindAsync(id);
+
+        if (recipe == null)
         {
-            return BadRequest();
+            return NotFound();
         }
 
         // Check if right owner performing task
@@ -75,11 +78,33 @@ public class RecipeController : ControllerBase
             return Unauthorized("Operation cannot be performed. You are not the owner of this recipe");
         }
 
+        // update the recipe with new data from recipeUpdateDto
+        recipe.Title = recipeUpdateDto.Title;
+        recipe.Description = recipeUpdateDto.Description;
+        recipe.Ingredients = recipeUpdateDto.Ingredients;
+        recipe.Steps = recipeUpdateDto.Steps;
+
         _context.Entry(recipe).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!RecipeExists(id))
+            {
+                return NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
 
         return NoContent();
     }
+
 
     // POST: api/Recipe
     [Authorize]     // Protected method
@@ -140,6 +165,11 @@ public class RecipeController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
+    }
+
+    private bool RecipeExists(int id)
+    {
+        return _context.Recipes.Any(e => e.Id == id);
     }
 
     private int GetUserIdFromToken()

@@ -90,3 +90,6 @@ bin/Debug/net6.0/Microsoft.IdentityModel.JsonWebTokens.dll
 bin/Debug/net6.0/Microsoft.IdentityModel.Logging.dll
 bin/Debug/net6.0/Microsoft.IdentityModel.Tokens.dll
 bin/Debug/net6.0/System.IdentityModel.Tokens.Jwt.dll
+bin/Debug/net6.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+bin/Debug/net6.0/Microsoft.IdentityModel.Protocols.dll
+bin/Debug/net6.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
