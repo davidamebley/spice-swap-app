@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 public class RecipeController : ControllerBase
 {
     private readonly DataContext _context;
-    
+
     public RecipeController(DataContext context)
     {
         _context = context;
@@ -14,16 +14,39 @@ public class RecipeController : ControllerBase
 
     // GET: api/Recipe
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Recipe>>> GetRecipes()
+    public async Task<ActionResult<IEnumerable<RecipeDto>>> GetRecipes()
     {
-        return await _context.Recipes.ToListAsync();
+        var recipes = await _context.Recipes
+                                    .Include(r => r.User)
+                                    .Select(r => new RecipeDto
+                                    {
+                                        Id = r.Id,
+                                        Title = r.Title,
+                                        Description = r.Description,
+                                        Ingredients = r.Ingredients,
+                                        Steps = r.Steps,
+                                        Username = r.User.Username
+                                    })
+                                    .ToListAsync();
+        return recipes;
     }
 
     // GET: api/Recipe/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Recipe>> GetRecipe(int id)
+    public async Task<ActionResult<RecipeDto>> GetRecipe(int id)
     {
-        var recipe = await _context.Recipes.FindAsync(id);
+        var recipe = await _context.Recipes
+                                   .Include(r => r.User)
+                                   .Select(r => new RecipeDto
+                                   {
+                                       Id = r.Id,
+                                       Title = r.Title,
+                                       Description = r.Description,
+                                       Ingredients = r.Ingredients,
+                                       Steps = r.Steps,
+                                       Username = r.User.Username
+                                   })
+                                   .FirstOrDefaultAsync(r => r.Id == id);
 
         if (recipe == null)
         {
@@ -50,13 +73,39 @@ public class RecipeController : ControllerBase
 
     // POST: api/Recipe
     [HttpPost]
-    public async Task<ActionResult<Recipe>> CreateRecipe(Recipe recipe)
+    public async Task<ActionResult<RecipeDto>> CreateRecipe(RecipeCreateDto recipeCreateDto)
     {
+        // Check if UserId is not valid
+        if (recipeCreateDto.UserId != 0)
+        {
+            return BadRequest("UserId is required");
+        }
+
+        var recipe = new Recipe
+        {
+            Title = recipeCreateDto.Title,
+            Description = recipeCreateDto.Description,
+            Ingredients = recipeCreateDto.Ingredients,
+            Steps = recipeCreateDto.Steps,
+            UserId = recipeCreateDto.UserId
+        };
+
         _context.Recipes.Add(recipe);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetRecipe), new { id = recipe.Id }, recipe);
+        var createdRecipe = new RecipeDto
+        {
+            Id = recipe.Id,
+            Title = recipe.Title,
+            Description = recipe.Description,
+            Ingredients = recipe.Ingredients,
+            Steps = recipe.Steps,
+            Username = _context.Users.Find(recipe.UserId).Username
+        };
+
+        return CreatedAtAction(nameof(GetRecipe), new { id = recipe.Id }, createdRecipe);
     }
+
 
     // DELETE: api/Recipe/5
     [HttpDelete("{id}")]
