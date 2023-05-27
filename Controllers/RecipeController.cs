@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -126,4 +127,22 @@ public class RecipeController : ControllerBase
 
         return NoContent();
     }
+
+    private int GetUserIdFromToken()
+    {
+        var identity = HttpContext.User.Identity as ClaimsIdentity;
+        var userIdClaim = identity?.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            throw new UnauthorizedAccessException("Invalid or expired token");
+        }
+
+        if (!int.TryParse(userIdClaim.Value, out var userId))
+        {
+            throw new Exception("Invalid user id in token");
+        }
+
+        return userId;
+    }
+
 }
