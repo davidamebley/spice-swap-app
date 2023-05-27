@@ -22,19 +22,20 @@ public async Task<ActionResult<UserDto>> Register(UserRegisterDto registerDto)
         return BadRequest("Username is already taken");
     }
 
-    using var hmac = new HMACSHA512();
-
     var user = new User 
     {
-        Username = registerDto.Username,
-        PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)),
-        PasswordSalt = hmac.Key
+        Username = registerDto.Username
     };
+
+    CreatePasswordHash(registerDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+    user.PasswordHash = passwordHash;
+    user.PasswordSalt = passwordSalt;
 
     _context.Users.Add(user);
     await _context.SaveChangesAsync();
 
-    return new UserDto { Id = user.Id, Username = user.Username };
+    return CreatedAtAction(nameof(GetUser), new { id = user.Id }, new { user.Id, user.Username });
 }
 
 [HttpPost("login")]
@@ -47,17 +48,14 @@ public async Task<ActionResult<UserDto>> Login(UserLoginDto loginDto)
         return Unauthorized("Invalid username");
     }
 
-    using var hmac = new HMACSHA512(user.PasswordSalt);
-
-    var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password));
-
-    for (int i = 0; i < computedHash.Length; i++)
+    if (!VerifyPasswordHash(loginDto.Password, user.PasswordHash, user.PasswordSalt))
     {
-        if (computedHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid password");
+        return Unauthorized("Invalid password");
     }
 
     return Ok(new UserDto { Id = user.Id, Username = user.Username });
 }
+
 
 // Handles GET requests for individual users based on their id
 [HttpGet("{id}")]
@@ -77,9 +75,29 @@ public async Task<ActionResult<UserDto>> GetUser(int id)
     };
 }
 
-
 private async Task<bool> UserExists(string username)
 {
     return await _context.Users.AnyAsync(u => u.Username == username.ToLower());
 }
+
+private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+{
+    using var hmac = new HMACSHA512();
+    passwordSalt = hmac.Key;
+    passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+}
+
+private bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
+{
+    using var hmac = new HMACSHA512(storedSalt);
+    var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+
+    for (int i = 0; i < computedHash.Length; i++)
+    {
+        if (computedHash[i] != storedHash[i]) return false;
+    }
+
+    return true;
+}
+
 }
