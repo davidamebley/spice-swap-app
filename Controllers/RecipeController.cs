@@ -75,10 +75,10 @@ public class RecipeController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<RecipeDto>> CreateRecipe(RecipeCreateDto recipeCreateDto)
     {
-        // Check if UserId is not valid
-        if (recipeCreateDto.UserId != 0)
+        // Check if UserId is valid
+        if (recipeCreateDto.UserId == 0)
         {
-            return BadRequest("UserId is required");
+            return BadRequest("A valid UserId is required");
         }
 
         var recipe = new Recipe
