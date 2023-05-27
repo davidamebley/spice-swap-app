@@ -13,14 +13,12 @@ public class UserController : ControllerBase
     private readonly DataContext _context;
     private readonly IConfiguration _configuration;
 
-    public UserController(DataContext context)
+    public UserController(DataContext context, IConfiguration configuration)
     {
         _context = context;
-    }
-    public UserController(IConfiguration configuration)
-    {
         _configuration = configuration;
     }
+
 
     [HttpPost("register")]
     public async Task<ActionResult<UserDto>> Register(UserRegisterDto registerDto)
