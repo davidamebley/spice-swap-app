@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+/* using Microsoft.AspNetCore.Mvc;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -29,3 +29,4 @@ public class RecipeController : ControllerBase
         // Fetch single recipe logic here
     }
 }
+ */
