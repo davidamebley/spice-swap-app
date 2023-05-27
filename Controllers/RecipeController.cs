@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -57,6 +58,7 @@ public class RecipeController : ControllerBase
     }
 
     // PUT: api/Recipe/5
+    [Authorize]     // Protected method
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateRecipe(int id, Recipe recipe)
     {
@@ -72,6 +74,7 @@ public class RecipeController : ControllerBase
     }
 
     // POST: api/Recipe
+    [Authorize]     // Protected method
     [HttpPost]
     public async Task<ActionResult<RecipeDto>> CreateRecipe(RecipeCreateDto recipeCreateDto)
     {
@@ -108,6 +111,7 @@ public class RecipeController : ControllerBase
 
 
     // DELETE: api/Recipe/5
+    [Authorize]     // Protected method
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteRecipe(int id)
     {
