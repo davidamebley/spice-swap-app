@@ -92,7 +92,7 @@ public class UserController : ControllerBase
     {
         var tokenHandler = new JwtSecurityTokenHandler();
 
-        var keyString = _configuration.GetSection("SecurityStrings: Token").Value;
+        var keyString = _configuration["SecurityStrings:Token"];
 
         // Check for valid key string/token
         if (keyString == null)
