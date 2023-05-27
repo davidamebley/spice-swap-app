@@ -1,17 +1,25 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 [Route("api/[controller]")]
 [ApiController]
 public class UserController : ControllerBase
 {
     private readonly DataContext _context;
+    private readonly IConfiguration _configuration;
 
     public UserController(DataContext context)
     {
         _context = context;
+    }
+    public UserController(IConfiguration configuration)
+    {
+        _configuration = configuration;
     }
 
     [HttpPost("register")]
@@ -53,7 +61,9 @@ public class UserController : ControllerBase
             return Unauthorized("Invalid password");
         }
 
-        return Ok(new UserDto { Id = user.Id, Username = user.Username });
+        var token = GenerateJwtToken(user);
+
+        return Ok(new { token });
     }
 
 
@@ -78,6 +88,35 @@ public class UserController : ControllerBase
     private async Task<bool> UserExists(string username)
     {
         return await _context.Users.AnyAsync(u => u.Username == username.ToLower());
+    }
+
+    private string GenerateJwtToken(User user)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        var keyString = _configuration.GetSection("SecurityStrings: Token").Value;
+
+        // Check for valid key string/token
+        if (keyString == null)
+        {
+            throw new Exception("Token key is not set in configuration");
+        }
+
+        var key = Encoding.ASCII.GetBytes(keyString);
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new Claim[]
+            {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.Username),
+            }),
+            Expires = DateTime.UtcNow.AddDays(7),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+
+        return tokenHandler.WriteToken(token);
     }
 
     private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

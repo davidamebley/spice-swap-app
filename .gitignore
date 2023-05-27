@@ -85,3 +85,8 @@ obj/Debug/net6.0/spice-swap-app.MvcApplicationPartsAssemblyInfo.cs
 obj/Debug/net6.0/spice-swap-app.pdb
 obj/Debug/net6.0/staticwebassets.build.json
 obj/Debug/net6.0/ref/spice-swap-app.dll
+bin/Debug/net6.0/Microsoft.IdentityModel.Abstractions.dll
+bin/Debug/net6.0/Microsoft.IdentityModel.JsonWebTokens.dll
+bin/Debug/net6.0/Microsoft.IdentityModel.Logging.dll
+bin/Debug/net6.0/Microsoft.IdentityModel.Tokens.dll
+bin/Debug/net6.0/System.IdentityModel.Tokens.Jwt.dll
