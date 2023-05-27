@@ -68,6 +68,13 @@ public class RecipeController : ControllerBase
             return BadRequest();
         }
 
+        // Check if right owner performing task
+        var userIdFromToken = GetUserIdFromToken();
+        if (userIdFromToken != recipe.UserId)
+        {
+            return Unauthorized("Operation cannot be performed. You are not the owner of this recipe");
+        }
+
         _context.Entry(recipe).State = EntityState.Modified;
         await _context.SaveChangesAsync();
 
@@ -120,6 +127,13 @@ public class RecipeController : ControllerBase
         if (recipe == null)
         {
             return NotFound();
+        }
+
+        // Check if right owner performing task
+        var userIdFromToken = GetUserIdFromToken();
+        if (userIdFromToken != recipe.UserId)
+        {
+            return Unauthorized("Operation cannot be performed. You are not the owner of this recipe");
         }
 
         _context.Recipes.Remove(recipe);
