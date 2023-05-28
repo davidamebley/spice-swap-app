@@ -172,13 +172,14 @@ public class RecipeController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(query))
         {
-            return BadRequest("Query parameter must be provided");
+            return BadRequest("A search query must be provided");
         }
 
         var recipes = await _context.Recipes
                                     .Include(r => r.User)
-                                    .Where(r => r.Title.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                                                r.Description.Contains(query, StringComparison.OrdinalIgnoreCase))
+                                    .Where(r => EF.Functions
+                                    .Like(r.Title, $"%{query}%") || EF.Functions
+                                    .Like(r.Description, $"%{query}%"))
                                     .Select(r => new RecipeDto
                                     {
                                         Id = r.Id,
