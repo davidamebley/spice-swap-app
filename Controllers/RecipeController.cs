@@ -61,7 +61,6 @@ public class RecipeController : ControllerBase
     // PUT: api/Recipe/5
     [Authorize]     // Protected method
     [HttpPut("{id}")]
-    [HttpPut("{id}")]
     public async Task<IActionResult> UpdateRecipe(int id, RecipeUpdateDto recipeUpdateDto)
     {
         var recipe = await _context.Recipes.FindAsync(id);
@@ -75,7 +74,7 @@ public class RecipeController : ControllerBase
         var userIdFromToken = GetUserIdFromToken();
         if (userIdFromToken != recipe.UserId)
         {
-            return Unauthorized("Operation cannot be performed. You are not the owner of this recipe");
+            return Unauthorized("Operation cannot be performed. You are not the owner of this recipe or you're not signed in.");
         }
 
         // update the recipe with new data from recipeUpdateDto
@@ -158,7 +157,7 @@ public class RecipeController : ControllerBase
         var userIdFromToken = GetUserIdFromToken();
         if (userIdFromToken != recipe.UserId)
         {
-            return Unauthorized("Operation cannot be performed. You are not the owner of this recipe");
+            return Unauthorized("Operation cannot be performed. You are not the owner of this recipe or you're not signed in.");
         }
 
         _context.Recipes.Remove(recipe);
@@ -166,6 +165,39 @@ public class RecipeController : ControllerBase
 
         return NoContent();
     }
+
+    // GET: api/Recipe/search?query={query}
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<RecipeDto>>> SearchRecipes(string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            return BadRequest("Query parameter must be provided");
+        }
+
+        var recipes = await _context.Recipes
+                                    .Include(r => r.User)
+                                    .Where(r => r.Title.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                                                r.Description.Contains(query, StringComparison.OrdinalIgnoreCase))
+                                    .Select(r => new RecipeDto
+                                    {
+                                        Id = r.Id,
+                                        Title = r.Title,
+                                        Description = r.Description,
+                                        Ingredients = r.Ingredients,
+                                        Steps = r.Steps,
+                                        Username = r.User.Username
+                                    })
+                                    .ToListAsync();
+
+        if (recipes.Count == 0)
+        {
+            return NotFound("No recipes found for the given query");
+        }
+
+        return recipes;
+    }
+
 
     private bool RecipeExists(int id)
     {
