@@ -175,6 +175,9 @@ public class RecipeController : ControllerBase
             return BadRequest("A search query must be provided");
         }
 
+        // Escape wildcard characters in user input
+        query = query.Replace("%", "[%]").Replace("_", "[_]");
+
         var recipes = await _context.Recipes
                                     .Include(r => r.User)
                                     .Where(r => EF.Functions
