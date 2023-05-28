@@ -42,6 +42,10 @@ const userSlice = createSlice({
         logout: (state) => {
             state.user = null;
         },
+        startRegistration: (state) => {
+            state.status = 'idle';
+            state.error = null;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -70,6 +74,6 @@ const userSlice = createSlice({
     },
 });
 
-export const { logout } = userSlice.actions;
+export const { logout, startRegistration } = userSlice.actions;
 
 export default userSlice.reducer;
