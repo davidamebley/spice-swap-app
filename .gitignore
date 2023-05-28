@@ -96,3 +96,10 @@ backend/obj/spice-swap-app.csproj.nuget.dgspec.json
 backend/obj/spice-swap-app.csproj.nuget.g.props
 backend/obj/spice-swap-app.csproj.nuget.g.targets
 backend/obj/staticwebassets.pack.sentinel
+backend/obj/Debug/net6.0/spice-swap-app.pdb
+backend/obj/Debug/net6.0/spice-swap-app.pdb
+backend/obj/Debug/net6.0/spice-swap-app.pdb
+frontend/.gitignore
+backend/obj/Debug/net6.0/spice-swap-app.pdb
+backend/obj/Debug/net6.0/spice-swap-app.pdb
+backend/obj/Debug/net6.0/spice-swap-app.pdb
