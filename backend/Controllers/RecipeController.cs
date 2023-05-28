@@ -33,6 +33,32 @@ public class RecipeController : ControllerBase
         return recipes;
     }
 
+    // GET: api/Recipe/user/5
+    [HttpGet("user/{userId}")]
+    public async Task<ActionResult<IEnumerable<RecipeDto>>> GetUserRecipes(int userId)
+    {
+        var recipes = await _context.Recipes
+                                    .Where(r => r.UserId == userId)
+                                    .Include(r => r.User)
+                                    .Select(r => new RecipeDto
+                                    {
+                                        Id = r.Id,
+                                        Title = r.Title,
+                                        Description = r.Description,
+                                        Ingredients = r.Ingredients,
+                                        Steps = r.Steps,
+                                        Username = r.User.Username
+                                    })
+                                    .ToListAsync();
+
+        if (recipes == null || recipes.Count == 0)
+        {
+            return NotFound();
+        }
+
+        return recipes;
+    }
+
     // GET: api/Recipe/5
     [HttpGet("{id}")]
     public async Task<ActionResult<RecipeDto>> GetRecipe(int id)
@@ -61,7 +87,7 @@ public class RecipeController : ControllerBase
     // PUT: api/Recipe/5
     [Authorize]     // Protected method
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateRecipe(int id, RecipeUpdateDto recipeUpdateDto)
+    public async Task<ActionResult<RecipeDto>> UpdateRecipe(int id, RecipeUpdateDto recipeUpdateDto)
     {
         var recipe = await _context.Recipes.FindAsync(id);
 
@@ -101,7 +127,18 @@ public class RecipeController : ControllerBase
             }
         }
 
-        return NoContent();
+        // Return updated recipe
+        var updatedRecipe = new RecipeDto
+        {
+            Id = recipe.Id,
+            Title = recipe.Title,
+            Description = recipe.Description,
+            Ingredients = recipe.Ingredients,
+            Steps = recipe.Steps,
+            Username = _context.Users.Find(recipe.UserId).Username
+        };
+
+        return updatedRecipe;
     }
 
 
@@ -145,7 +182,7 @@ public class RecipeController : ControllerBase
     // DELETE: api/Recipe/5
     [Authorize]     // Protected method
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteRecipe(int id)
+    public async Task<ActionResult<RecipeDto>> DeleteRecipe(int id)
     {
         var recipe = await _context.Recipes.FindAsync(id);
         if (recipe == null)
@@ -160,10 +197,22 @@ public class RecipeController : ControllerBase
             return Unauthorized("Operation cannot be performed. You are not the owner of this recipe or you're not signed in.");
         }
 
+        // Create RecipeDto from recipe before deleting
+        var deletedRecipe = new RecipeDto
+        {
+            Id = recipe.Id,
+            Title = recipe.Title,
+            Description = recipe.Description,
+            Ingredients = recipe.Ingredients,
+            Steps = recipe.Steps,
+            Username = _context.Users.Find(recipe.UserId).Username
+        };
+
         _context.Recipes.Remove(recipe);
         await _context.SaveChangesAsync();
 
-        return NoContent();
+        // Return deleted recipe
+        return deletedRecipe;
     }
 
     // GET: api/Recipe/search?query={query}
