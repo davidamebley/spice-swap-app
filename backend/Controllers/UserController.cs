@@ -23,6 +23,18 @@ public class UserController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<UserDto>> Register(UserRegisterDto registerDto)
     {
+        // Check if username or password is empty
+        if (string.IsNullOrEmpty(registerDto.Username) || string.IsNullOrEmpty(registerDto.Password))
+        {
+            return BadRequest("Username and password are required");
+        }
+
+        // Check if username contains spaces
+        if (registerDto.Username.Contains(" "))
+        {
+            return BadRequest("Username cannot contain spaces");
+        }
+
         if (await UserExists(registerDto.Username))
         {
             return BadRequest("Username is already taken");
