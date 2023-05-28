@@ -1,3 +1,4 @@
+"use strict";
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Home from '../components/Home';
@@ -7,6 +8,7 @@ import RecipeDetail from '../components/RecipeDetail';
 import NewRecipe from '../components/NewRecipe';
 import UpdateRecipe from '../components/UpdateRecipe';
 import UserRecipes from '../components/UserRecipes';
+import NotFound from '../components/NotFound';
 
 const AppRouter = () => {
   return (
@@ -19,6 +21,7 @@ const AppRouter = () => {
         <Route path="/new" component={NewRecipe} />
         <Route path="/update/:id" component={UpdateRecipe} />
         <Route path="/userrecipes" component={UserRecipes} />
+        <Route path="*" component={NotFound} />
       </Switch>
     </Router>
   );
