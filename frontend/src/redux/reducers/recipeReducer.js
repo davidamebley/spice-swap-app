@@ -46,13 +46,14 @@ export const fetchSingleRecipe = createAsyncThunk(
 
 export const createRecipe = createAsyncThunk(
     'recipes/createRecipe',
-    async (recipeData, { rejectWithValue }) => {
+    async (formData, { rejectWithValue }) => {
         // Token is stored in local storage
         const token = localStorage.getItem('token');
         try {
-            const response = await axios.post(`${API_URL}`, recipeData, {
+            const response = await axios.post(`${API_URL}`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
                 }
             });
             return response.data;
