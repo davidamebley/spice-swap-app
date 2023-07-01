@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
 import { Button, TextField, Typography, Grid, CircularProgress, Box, Container } from '@mui/material';
 import { styled } from '@mui/system';
 
-import { registerUser, startRegistration } from '../redux/reducers/userReducer';
+import { registerUser, startRegistration, clearError } from '../redux/reducers/userReducer';
 
 const Form = styled('form')({
   width: '40%', // Stretch form width
@@ -18,16 +19,30 @@ function Register() {
   const [password, setPassword] = useState('');
   const [passwordVerify, setPasswordVerify] = useState('');
   const [inputError, setInputError] = useState('');
+  const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
   const user = useSelector(state => state.user);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user.status === 'succeeded') {
-      alert("Registration successful! Redirecting to login...");
+    if (!user.user && user.status === 'succeeded') {
+      enqueueSnackbar('Registration successful! Redirecting to login...', { variant: 'success' });
       navigate("/login");
     }
-  }, [user, navigate]);
+    if (user.status === 'failed') {
+      let errorMessage = typeof user.error === 'string' ? user.error : 'An error occurred';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+      dispatch(clearError());
+    }
+
+    return () => {
+      dispatch(clearError());
+      dispatch(startRegistration());
+    };
+  }, [user, navigate, enqueueSnackbar]);
+
+
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -52,11 +67,11 @@ function Register() {
   }
 
   return (
-    <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+    <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'start', height: '100vh', marginTop: '2em' }}>
       <Form onSubmit={handleSubmit}>
         <Grid container direction="column" spacing={2}>
           <Grid item>
-            <Typography variant="h4">Register</Typography>
+            <Typography variant="h4">Register on Spice Swap</Typography>
           </Grid>
           <Grid item>
             <TextField
@@ -104,13 +119,13 @@ function Register() {
           </Grid>
 
           {/* Display error message if registration fails */}
-          {user.status === 'failed' &&
+          {/* {user.status === 'failed' &&
             <Grid item>
               <Box color="error.main">
                 <Typography variant="body1">{user.error}</Typography>
               </Box>
             </Grid>
-          }
+          } */}
         </Grid>
       </Form>
     </Container>
