@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/spice-swap-app.props" />
+</Project>
