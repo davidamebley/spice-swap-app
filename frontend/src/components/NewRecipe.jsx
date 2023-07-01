@@ -41,13 +41,14 @@ const NewRecipe = () => {
 
     try {
       // Logic to send the form data to the backend
-      const action = await dispatch(createRecipe({
+      const action = await dispatch(createRecipe(formData/* {
         title,
         description,
         ingredients,
         steps,
         userId: currentUserID
-      }));
+        
+      } */));
       // navigate(`/recipe/${action.payload.id}`, { replace: true });
       setNewRecipeId(action.payload.id); // Save the new recipe id
       setSubmissionSuccessful(true);
@@ -132,6 +133,18 @@ const NewRecipe = () => {
             value={steps}
             onChange={(e) => setSteps(e.target.value)}
           />
+          <input
+            accept="image/*"
+            type="file"
+            id="thumbnailFile"
+            onChange={(e) => setThumbnailFile(e.target.files[0])}
+            hidden
+          />
+          <label htmlFor="thumbnailFile">
+            <Button variant="contained" component="span">
+              Upload Recipe Image
+            </Button>
+          </label>
           <Button
             type="submit"
             fullWidth
