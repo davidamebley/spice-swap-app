@@ -1,11 +1,24 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import jwt_decode from 'jwt-decode';
 
 const API_URL = 'https://localhost:7037/api/User';
 
+let userFromToken = null;
+const token = localStorage.getItem('token');
+
+if (token) {
+    try {
+        const decoded = jwt_decode(token);
+        userFromToken = { username: decoded.unique_name, id: decoded.nameid };
+    } catch (error) {
+        console.log('Error decoding token', error);
+    }
+}
+
 // Initial state
 const initialState = {
-    user: null,
+    user: userFromToken,
     status: 'idle',
     error: null
 };
@@ -16,7 +29,13 @@ export const loginUser = createAsyncThunk(
     async (userData, { rejectWithValue }) => {
         try {
             const response = await axios.post(`${API_URL}/login`, userData);
-            return response.data;
+            // Store JWT token on login success in browser's local storage
+            if (response.data.token) {
+                localStorage.setItem('token', response.data.token);
+            }
+            const decoded = jwt_decode(response.data.token);
+            const user = { username: decoded.unique_name, id: decoded.nameid };
+            return { token: response.data.token, user }; // return user in the payload
         } catch (err) {
             return rejectWithValue(err.response.data);
         }
@@ -41,11 +60,15 @@ const userSlice = createSlice({
     reducers: {
         logout: (state) => {
             state.user = null;
+            localStorage.removeItem('token'); // Remove the token from local storage on logout
         },
         startRegistration: (state) => {
             state.status = 'idle';
             state.error = null;
-        }
+        },
+        clearError: (state) => {
+            state.error = null;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -54,7 +77,8 @@ const userSlice = createSlice({
             })
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.user = action.payload;
+                state.user = action.payload.user;
+                localStorage.setItem('token', action.payload.token);
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.status = 'failed';
@@ -74,6 +98,6 @@ const userSlice = createSlice({
     },
 });
 
-export const { logout, startRegistration } = userSlice.actions;
+export const { logout, startRegistration, clearError } = userSlice.actions;
 
 export default userSlice.reducer;
