@@ -47,8 +47,14 @@ export const fetchSingleRecipe = createAsyncThunk(
 export const createRecipe = createAsyncThunk(
     'recipes/createRecipe',
     async (recipeData, { rejectWithValue }) => {
+        // Token is stored in local storage
+        const token = localStorage.getItem('token');
         try {
-            const response = await axios.post(`${API_URL}`, recipeData);
+            const response = await axios.post(`${API_URL}`, recipeData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
             return response.data;
         } catch (err) {
             return rejectWithValue(err.response.data);
@@ -59,8 +65,14 @@ export const createRecipe = createAsyncThunk(
 export const updateRecipe = createAsyncThunk(
     'recipes/updateRecipe',
     async ({ id, updatedRecipeData }, { rejectWithValue }) => {
+        // Token is stored in local storage
+        const token = localStorage.getItem('token');
         try {
-            const response = await axios.put(`${API_URL}/${id}`, updatedRecipeData);
+            const response = await axios.put(`${API_URL}/${id}`, updatedRecipeData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
             return response.data;
         } catch (err) {
             return rejectWithValue(err.response.data);
@@ -71,8 +83,14 @@ export const updateRecipe = createAsyncThunk(
 export const fetchUserRecipes = createAsyncThunk(
     'recipes/fetchUserRecipes',
     async (userId, { rejectWithValue }) => {
+        // Token is stored in local storage
+        const token = localStorage.getItem('token');
         try {
-            const response = await axios.get(`${API_URL}/user/${userId}`);
+            const response = await axios.get(`${API_URL}/user/${userId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
             return response.data;
         } catch (err) {
             return rejectWithValue(err.response.data);
@@ -83,8 +101,14 @@ export const fetchUserRecipes = createAsyncThunk(
 export const deleteRecipe = createAsyncThunk(
     'recipes/deleteRecipe',
     async (recipeId, { rejectWithValue }) => {
+        // Token is stored in local storage
+        const token = localStorage.getItem('token');
         try {
-            const response = await axios.delete(`${API_URL}/${recipeId}`);
+            const response = await axios.delete(`${API_URL}/${recipeId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
             return response.data;
         } catch (err) {
             return rejectWithValue(err.response.data);
