@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Newtonsoft.Json;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -50,11 +51,6 @@ public class RecipeController : ControllerBase
                                         Username = r.User.Username
                                     })
                                     .ToListAsync();
-
-        if (recipes == null || recipes.Count == 0)
-        {
-            return NotFound();
-        }
 
         return recipes;
     }
@@ -147,6 +143,8 @@ public class RecipeController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<RecipeDto>> CreateRecipe(RecipeCreateDto recipeCreateDto)
     {
+        Console.WriteLine("New Recipe Obj from client: " + JsonConvert.SerializeObject(recipeCreateDto));
+
         // Check if UserId is valid
         if (recipeCreateDto.UserId == 0)
         {
@@ -250,6 +248,39 @@ public class RecipeController : ControllerBase
 
         return recipes;
     }
+
+    // Search for recipes belonging to current/specific user
+    // GET: api/Recipe/user/{userId}/search?query={query}
+    [HttpGet("user/{userId}/search")]
+    public async Task<ActionResult<IEnumerable<RecipeDto>>> SearchUserRecipes(int userId, string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            return BadRequest("A search query must be provided");
+        }
+
+        // Escape wildcard characters in user input
+        query = query.Replace("%", "[%]").Replace("_", "[_]");
+
+        var recipes = await _context.Recipes
+                                    .Include(r => r.User)
+                                    .Where(r => r.UserId == userId && (EF.Functions
+                                    .Like(r.Title, $"%{query}%") || EF.Functions
+                                    .Like(r.Description, $"%{query}%")))
+                                    .Select(r => new RecipeDto
+                                    {
+                                        Id = r.Id,
+                                        Title = r.Title,
+                                        Description = r.Description,
+                                        Ingredients = r.Ingredients,
+                                        Steps = r.Steps,
+                                        Username = r.User.Username
+                                    })
+                                    .ToListAsync();
+
+        return recipes;
+    }
+
 
 
     private bool RecipeExists(int id)
