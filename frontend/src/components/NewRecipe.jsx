@@ -10,6 +10,7 @@ const NewRecipe = () => {
   const [description, setDescription] = useState('');
   const [ingredients, setIngredients] = useState('');
   const [steps, setSteps] = useState('');
+  const [thumbnailFile, setThumbnailFile] = useState(null);
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [submissionSuccessful, setSubmissionSuccessful] = useState(false);
@@ -28,6 +29,15 @@ const NewRecipe = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
+
+    // Create a new FormData object
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('ingredients', ingredients);
+    formData.append('steps', steps);
+    formData.append('userId', currentUserID);
+    formData.append('thumbnailFile', thumbnailFile);
 
     try {
       // Logic to send the form data to the backend

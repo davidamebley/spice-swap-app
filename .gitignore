@@ -105,3 +105,6 @@ backend/obj/Debug/net6.0/spice-swap-app.pdb
 backend/obj/Debug/net6.0/spice-swap-app.pdb
 .DS_Store
 backend/.DS_Store
+.db
+backend/.db
+backend/dump/spice-swap-app.db
