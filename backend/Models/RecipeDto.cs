@@ -5,5 +5,6 @@ public class RecipeDto
     public string Description { get; set; }
     public string Ingredients { get; set; }
     public string Steps { get; set; }
+    public string ThumbnailUrl { get; set; }
     public string Username { get; set; }
 }
