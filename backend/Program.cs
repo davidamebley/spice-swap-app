@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.json");
 
 // Add services to the container.
-// Add CORS
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("MyCorsPolicy",
@@ -18,6 +18,16 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader(); // Allows all headers.;
         });
 });
+
+// Retrieve the Blob Storage connection string
+var blobStorageConnectionString = builder.Configuration.GetConnectionString("BlobStorageConnection");
+if (string.IsNullOrEmpty(blobStorageConnectionString))
+{
+    throw new ArgumentException("Blob Storage connection string is missing in the configuration");
+}
+var containerName = "container-spiceswap";
+builder.Services.AddSingleton(new BlobStorageService(blobStorageConnectionString, containerName));
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
