@@ -1,5 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import jwt_decode from 'jwt-decode';
+
+import { logout } from './userReducer';
 
 const API_URL = 'https://localhost:7037/api/Recipe';
 
@@ -46,14 +49,28 @@ export const fetchSingleRecipe = createAsyncThunk(
 
 export const createRecipe = createAsyncThunk(
     'recipes/createRecipe',
-    async (formData, { rejectWithValue }) => {
+    async (formData, { dispatch, rejectWithValue }) => {
         // Token is stored in local storage
         const token = localStorage.getItem('token');
+        if (!token) {
+            // If no token, logout user
+            dispatch(logout());
+            return rejectWithValue('No token found');
+        }
+
+        const decoded_token = jwt_decode(token);
+        const currentTimestamp = Math.floor(Date.now() / 1000);
+        if (decoded_token.exp < currentTimestamp) {
+            // If token expired, logout user
+            dispatch(logout());
+            return rejectWithValue('Token expired');
+        }
+
         try {
             const response = await axios.post(`${API_URL}`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
+                    // 'Content-Type': 'multipart/form-data'
                 }
             });
             return response.data;
@@ -65,9 +82,24 @@ export const createRecipe = createAsyncThunk(
 
 export const updateRecipe = createAsyncThunk(
     'recipes/updateRecipe',
-    async ({ id, updatedRecipeData }, { rejectWithValue }) => {
+    async ({ id, updatedRecipeData }, { dispatch, rejectWithValue }) => {
         // Token is stored in local storage
         const token = localStorage.getItem('token');
+
+        if (!token) {
+            // If no token, logout user
+            dispatch(logout());
+            return rejectWithValue('No token found');
+        }
+
+        const decoded_token = jwt_decode(token);
+        const currentTimestamp = Math.floor(Date.now() / 1000);
+        if (decoded_token.exp < currentTimestamp) {
+            // If token expired, logout user
+            dispatch(logout());
+            return rejectWithValue('Token expired');
+        }
+
         try {
             const response = await axios.put(`${API_URL}/${id}`, updatedRecipeData, {
                 headers: {
@@ -83,9 +115,24 @@ export const updateRecipe = createAsyncThunk(
 
 export const fetchUserRecipes = createAsyncThunk(
     'recipes/fetchUserRecipes',
-    async (userId, { rejectWithValue }) => {
+    async (userId, { dispatch, rejectWithValue }) => {
         // Token is stored in local storage
         const token = localStorage.getItem('token');
+
+        if (!token) {
+            // If no token, logout user
+            dispatch(logout());
+            return rejectWithValue('No token found');
+        }
+
+        const decoded_token = jwt_decode(token);
+        const currentTimestamp = Math.floor(Date.now() / 1000);
+        if (decoded_token.exp < currentTimestamp) {
+            // If token expired, logout user
+            dispatch(logout());
+            return rejectWithValue('Token expired');
+        }
+
         try {
             const response = await axios.get(`${API_URL}/user/${userId}`, {
                 headers: {
@@ -101,9 +148,24 @@ export const fetchUserRecipes = createAsyncThunk(
 
 export const deleteRecipe = createAsyncThunk(
     'recipes/deleteRecipe',
-    async (recipeId, { rejectWithValue }) => {
+    async (recipeId, { dispatch, rejectWithValue }) => {
         // Token is stored in local storage
         const token = localStorage.getItem('token');
+
+        if (!token) {
+            // If no token, logout user
+            dispatch(logout());
+            return rejectWithValue('No token found');
+        }
+
+        const decoded_token = jwt_decode(token);
+        const currentTimestamp = Math.floor(Date.now() / 1000);
+        if (decoded_token.exp < currentTimestamp) {
+            // If token expired, logout user
+            dispatch(logout());
+            return rejectWithValue('Token expired');
+        }
+
         try {
             const response = await axios.delete(`${API_URL}/${recipeId}`, {
                 headers: {
