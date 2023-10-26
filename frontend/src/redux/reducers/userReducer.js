@@ -61,6 +61,8 @@ const userSlice = createSlice({
         logout: (state) => {
             state.user = null;
             localStorage.removeItem('token'); // Remove the token from local storage on logout
+            // Redirect to login page
+            window.location.href = '/login';
         },
         startRegistration: (state) => {
             state.status = 'idle';
