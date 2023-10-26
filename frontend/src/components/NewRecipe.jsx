@@ -11,6 +11,7 @@ const NewRecipe = () => {
   const [ingredients, setIngredients] = useState('');
   const [steps, setSteps] = useState('');
   const [thumbnailFile, setThumbnailFile] = useState(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState('');
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [submissionSuccessful, setSubmissionSuccessful] = useState(false);
@@ -135,16 +136,20 @@ const NewRecipe = () => {
           />
           <input
             accept="image/*"
-            type="file"
             id="thumbnailFile"
-            onChange={(e) => setThumbnailFile(e.target.files[0])}
+            type="file"
+            onChange={(e) => {
+              setThumbnailFile(e.target.files[0]);
+              setThumbnailUrl(URL.createObjectURL(e.target.files[0]));
+            }}
             hidden
           />
           <label htmlFor="thumbnailFile">
             <Button variant="contained" component="span">
-              Upload Recipe Image
+              Upload Thumbnail
             </Button>
           </label>
+          {thumbnailUrl && <img src={thumbnailUrl} alt="thumbnail" style={{ width: '100%', height: 'auto' }} />}
           <Button
             type="submit"
             fullWidth
