@@ -33,36 +33,37 @@ const NewRecipe = () => {
 
     // Create a new FormData object
     const formData = new FormData();
-    formData.append('title', title);
-    formData.append('description', description);
-    formData.append('ingredients', ingredients);
-    formData.append('steps', steps);
-    formData.append('userId', currentUserID);
     formData.append('thumbnailFile', thumbnailFile);
+    formData.append('jsonString', JSON.stringify({
+      title,
+      description,
+      ingredients,
+      steps,
+      userId: currentUserID,
+    }));
+    // formData.append('title', title);
+    // formData.append('description', description);
+    // formData.append('ingredients', ingredients);
+    // formData.append('steps', steps);
+    // formData.append('userId', currentUserID);
 
+    // Logic to send the form data to the backend
     try {
-      // Logic to send the form data to the backend
-      const action = await dispatch(createRecipe(formData/* {
-        title,
-        description,
-        ingredients,
-        steps,
-        userId: currentUserID
-        
-      } */));
-      // navigate(`/recipe/${action.payload.id}`, { replace: true });
-      setNewRecipeId(action.payload.id); // Save the new recipe id
-      setSubmissionSuccessful(true);
-      setOpen(true);
-      resetForm();
+      const action = await dispatch(createRecipe(formData));
+      const newRecipe = action.payload;
+      if (newRecipe && newRecipe.id) {
+        setNewRecipeId(newRecipe.id);
+        setSubmissionSuccessful(true);
+        setOpen(true);
+        resetForm();
+      }
     } catch (error) {
       console.error('Failed to create new recipe: ', error);
       setSubmissionSuccessful(false);
       setOpen(true);
     } finally {
       setIsLoading(false);
-
-    };
+    }
   };
 
   // Handling the snackbar
