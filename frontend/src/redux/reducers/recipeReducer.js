@@ -70,12 +70,11 @@ export const createRecipe = createAsyncThunk(
             const response = await axios.post(`${API_URL}`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    // 'Content-Type': 'multipart/form-data'
                 }
             });
-            return response.data;
+            return Promise.resolve(response.data);  // resolve the promise with data
         } catch (err) {
-            return rejectWithValue(err.response.data);
+            return rejectWithValue(err.response.data);  // reject the promise with error data
         }
     }
 );
