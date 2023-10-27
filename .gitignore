@@ -124,3 +124,10 @@ backend/obj/Debug/net6.0/refint/spice-swap-app.dll
 backend/obj/Debug/net6.0/spice-swap-app.pdb
 backend/obj/Debug/net6.0/refint/spice-swap-app.dll
 backend/obj/Debug/net6.0/refint/spice-swap-app.dll
+backend/dump/spice-swap-app.db
+backend/dump/spice-swap-app.db
+backend/obj/Debug/net6.0/spice-swap-app.pdb
+backend/obj/Debug/net6.0/refint/spice-swap-app.dll
+backend/obj/Debug/net6.0/refint/spice-swap-app.dll
+.gitignore
+.gitignore

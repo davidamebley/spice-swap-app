@@ -141,12 +141,14 @@ public class RecipeController : ControllerBase
     // POST: api/Recipe
     [Authorize]     // Protected method
     [HttpPost]
-    public async Task<ActionResult<RecipeDto>> CreateRecipe(RecipeCreateDto recipeCreateDto)
+    public async Task<ActionResult<RecipeDto>> CreateRecipe([FromForm] string jsonString, [FromForm] IFormFile thumbnailFile)
     {
+        var recipeCreateDto = JsonConvert.DeserializeObject<RecipeCreateDto>(jsonString);
+
         Console.WriteLine("New Recipe Obj from client: " + JsonConvert.SerializeObject(recipeCreateDto));
 
         // Check if UserId is valid
-        if (recipeCreateDto.UserId == 0)
+        if (recipeCreateDto?.UserId == 0)
         {
             return BadRequest("A valid UserId is required");
         }
@@ -159,6 +161,13 @@ public class RecipeController : ControllerBase
             Steps = recipeCreateDto.Steps,
             UserId = recipeCreateDto.UserId
         };
+
+        if (thumbnailFile != null && thumbnailFile.Length > 0)
+        {
+            // Handle file upload
+            // Update the recipe object with the file path or URL
+            Console.WriteLine("File name: " + thumbnailFile.FileName);
+        }
 
         _context.Recipes.Add(recipe);
         await _context.SaveChangesAsync();
