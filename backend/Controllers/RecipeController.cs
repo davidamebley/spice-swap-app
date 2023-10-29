@@ -9,10 +9,12 @@ using Newtonsoft.Json;
 public class RecipeController : ControllerBase
 {
     private readonly DataContext _context;
+    private readonly BlobStorageService _blobStorageService;
 
-    public RecipeController(DataContext context)
+    public RecipeController(DataContext context, BlobStorageService blobStorageService)
     {
-        _context = context;
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+        _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
     }
 
     // GET: api/Recipe
@@ -165,8 +167,8 @@ public class RecipeController : ControllerBase
         if (thumbnailFile != null && thumbnailFile.Length > 0)
         {
             // Handle file upload
-            // Update the recipe object with the file path or URL
-            Console.WriteLine("File name: " + thumbnailFile.FileName);
+            var thumbnailUrl = await _blobStorageService.UploadFileAsync(thumbnailFile);
+            recipe.ThumbnailUrl = thumbnailUrl;
         }
 
         _context.Recipes.Add(recipe);
