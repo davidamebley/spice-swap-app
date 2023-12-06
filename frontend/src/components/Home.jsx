@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Container, TextField, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
@@ -13,7 +13,7 @@ const Home = () => {
   const currentUser = useSelector((state) => state.user.user?.username);
   const API_URL = 'https://localhost:7037/api/Recipe';
 
-  const { data: recipes, refetch } = useQuery(
+  const { data: recipes, refetch, isLoading, isError, error } = useQuery(
     ['recipes', searchValue],
     () => axios.get(searchValue ? `${API_URL}/search?query=${searchValue}` : API_URL).then(res => res.data),
     { keepPreviousData: true }
@@ -24,9 +24,11 @@ const Home = () => {
     setSearchValue(e.target.value);
     refetch();
   };
-
+  console.log(recipes);
   return (
     <Container>
+      {isLoading && <p>Loading...</p>}
+      {isError && <p>Error: {error.message}</p>}
       <TextField
         label="Search for recipes"
         variant="outlined"
