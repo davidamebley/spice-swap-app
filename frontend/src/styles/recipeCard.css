@@ -1,0 +1,29 @@
+.recipeCardTitle {
+  font-size: 1rem !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 95%;
+}
+
+.recipeCardDescription {
+  font-size: 0.8rem;
+  color: #666;
+  max-width: 95%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recipeCardAuthor {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 0.3rem;
+}
+
+.thumbnail-image {
+  width: 100%;
+  max-height: 80px; /* To control the height of the image */
+  border-radius: 0.95rem 0.95rem 0 0;
+  object-fit: cover; /* To maintain the aspect ratio of the image */
+}

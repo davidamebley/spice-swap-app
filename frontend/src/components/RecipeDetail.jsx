@@ -5,6 +5,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Card, CardContent, Box, CircularProgress, Alert, List, ListItem, ListItemText, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 
 import { deleteRecipe } from '../redux/reducers/recipeReducer';
+import '../styles/recipeDetail.css';
+import theme from '../styles/theme';
 
 const RecipeDetail = () => {
   const { id } = useParams(); // Extracting the recipe id from the URL
@@ -83,24 +85,42 @@ const RecipeDetail = () => {
       alignItems="center"
       justifyContent="center"
       minHeight="100vh" // to take the full height of the screen
+      bgcolor={theme.colors.background}
     >
-      <Card sx={{ maxWidth: '60%', width: '100%', m: 2 }}>
+      <Card sx={{
+        maxWidth: '60%',
+        width: '100%',
+        m: 2,
+        borderRadius: theme.cardBorderRadius,
+        boxShadow: theme.cardBoxShadow,   // Soft shadow
+      }}>
+
+        {/* Featured image */}
+        <img src={recipe.thumbnailUrl} alt={recipe.title} className='recipe-image' />
+
         <CardContent>
-          <Typography gutterBottom variant="h4" component="div">
+          <Typography gutterBottom variant="h4" component="div" sx={{ font: 'bold' }}>
             {recipe.title}
           </Typography>
-          <Box mt={2}>
-            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', fontWeight: 'bold' }} >
-              ~ Spiced by &bull; {recipe.username === currentUser ? 'You' : recipe.username}
+
+          <Box mt={2} display="flex" justifyContent="space-between">
+            <Typography variant="body1" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+              📅 Prep Time: {recipe.prepTime || "-"} | Cook Time: {recipe.cookTime || "-"} | Servings: {recipe.servings || "-"}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Made by &bull; {recipe.username === currentUser ? 'You' : recipe.username}
             </Typography>
           </Box>
+
           <Typography variant="h6" color="text.secondary" mt={4}>
             Description:
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body1" color="text.secondary" mt={2}>
             {recipe.description}
           </Typography>
-          <Box mt={3}>
+
+          {/* Ingredients */}
+          <Box mt={4} bgcolor={theme.colors.sectionBg} p={2} borderRadius={theme.sectionBorderRadius}>
             <Typography variant="h6" color="text.secondary">
               Ingredients:
             </Typography>
@@ -112,7 +132,9 @@ const RecipeDetail = () => {
               ))}
             </List>
           </Box>
-          <Box mt={3}>
+
+          {/* Steps */}
+          <Box mt={4} bgcolor={theme.colors.sectionBg} p={2} borderRadius={theme.sectionBorderRadius}>
             <Typography variant="h6" color="text.secondary">
               Steps:
             </Typography>
@@ -125,13 +147,15 @@ const RecipeDetail = () => {
             </List>
           </Box>
         </CardContent>
+
+        {/* Button actions */}
         {recipe.username === currentUser && (
           <>
-            <Box sx={{ display: 'flex', justifyContent: 'space-evenly', p: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-evenly', p: 2, background: theme.colors.sectionBg, borderRadius: '0 0 15px 15px' }}>
               <Button variant="contained" color="primary" onClick={handleUpdate}>
                 Update Recipe
               </Button>
-              <Button variant="contained" style={{ backgroundColor: '#f44336', color: '#fff' }} onClick={handleClickOpen}>
+              <Button variant="contained" color="error" onClick={handleClickOpen}>
                 Delete Recipe
               </Button>
             </Box>
