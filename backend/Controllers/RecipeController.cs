@@ -30,7 +30,8 @@ public class RecipeController : ControllerBase
                                         Description = r.Description,
                                         Ingredients = r.Ingredients,
                                         Steps = r.Steps,
-                                        Username = r.User.Username
+                                        Username = r.User.Username,
+                                        ThumbnailUrl = r.ThumbnailUrl
                                     })
                                     .ToListAsync();
         return recipes;
@@ -50,7 +51,8 @@ public class RecipeController : ControllerBase
                                         Description = r.Description,
                                         Ingredients = r.Ingredients,
                                         Steps = r.Steps,
-                                        Username = r.User.Username
+                                        Username = r.User.Username,
+                                        ThumbnailUrl = r.ThumbnailUrl
                                     })
                                     .ToListAsync();
 
@@ -70,7 +72,8 @@ public class RecipeController : ControllerBase
                                        Description = r.Description,
                                        Ingredients = r.Ingredients,
                                        Steps = r.Steps,
-                                       Username = r.User.Username
+                                       Username = r.User.Username,
+                                       ThumbnailUrl = r.ThumbnailUrl
                                    })
                                    .FirstOrDefaultAsync(r => r.Id == id);
 
@@ -181,7 +184,8 @@ public class RecipeController : ControllerBase
             Description = recipe.Description,
             Ingredients = recipe.Ingredients,
             Steps = recipe.Steps,
-            Username = _context.Users.Find(recipe.UserId).Username
+            Username = _context.Users.Find(recipe.UserId).Username,
+            ThumbnailUrl = recipe.ThumbnailUrl
         };
 
         return CreatedAtAction(nameof(GetRecipe), new { id = recipe.Id }, createdRecipe);
@@ -248,7 +252,8 @@ public class RecipeController : ControllerBase
                                         Description = r.Description,
                                         Ingredients = r.Ingredients,
                                         Steps = r.Steps,
-                                        Username = r.User.Username
+                                        Username = r.User.Username,
+                                        ThumbnailUrl = r.ThumbnailUrl
                                     })
                                     .ToListAsync();
 
